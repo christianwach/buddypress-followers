@@ -57,13 +57,19 @@ add_action( 'bp_include', 'bp_follow_init' );
  * @return bool True if textdomain loaded; false if not.
  */
 function bp_follow_localization() {
-	$domain = 'buddypress-followers';
-	$mofile_custom = trailingslashit( WP_LANG_DIR ) . sprintf( '%s-%s.mo', $domain, get_locale() );
+    // Don't load translations before 'init' hook to prevent JIT errors
+    if (!did_action('init')) {
+        return false;
+    }
+    
+    $domain = 'buddypress-followers';
+    $mofile_custom = trailingslashit(WP_LANG_DIR) . sprintf('%s-%s.mo', $domain, get_locale());
 
-	if ( is_readable( $mofile_custom ) ) {
-		return load_textdomain( $domain, $mofile_custom );
-	} else {
-		return load_plugin_textdomain( $domain, false, basename( BP_FOLLOW_DIR ) . '/languages/' );
-	}
+    if (is_readable($mofile_custom)) {
+        return load_textdomain($domain, $mofile_custom);
+    } else {
+        return load_plugin_textdomain($domain, false, basename(BP_FOLLOW_DIR) . '/languages/');
+    }
 }
-add_action( 'plugins_loaded', 'bp_follow_localization' );
+// Use the 'init' hook instead of 'plugins_loaded' for proper timing
+add_action('init', 'bp_follow_localization', 5);
