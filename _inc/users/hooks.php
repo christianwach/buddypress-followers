@@ -25,11 +25,6 @@ defined( 'ABSPATH' ) || exit;
 function bp_follow_user_setup_nav( $main_nav = array(), $sub_nav = array() ) {
 	$bp = $GLOBALS['bp'];
 
-	// If using an older version of BP, check bp_use_admin_bar().
-	if ( defined( 'WP_NETWORK_ADMIN' ) && function_exists( 'bp_use_wp_admin_bar' ) && bp_use_wp_admin_bar() ) {
-		return;
-	}
-
 	// Need to change the user ID, so if we're not on a member page, $counts variable is still calculated.
 	$user_id = bp_is_user() ? bp_displayed_user_id() : bp_loggedin_user_id();
 
@@ -87,9 +82,6 @@ function bp_follow_user_setup_nav( $main_nav = array(), $sub_nav = array() ) {
 			)
 		);
 	}
-
-	// BuddyBar compatibility.
-	add_action( 'bp_adminbar_menus', 'bp_follow_group_buddybar_items' );
 }
 add_action( 'bp_follow_setup_nav', 'bp_follow_user_setup_nav', 10, 2 );
 
@@ -179,87 +171,6 @@ function bp_follow_user_activity_admin_nav_toolbar( $retval ) {
 	return $retval;
 }
 add_action( 'bp_activity_admin_nav', 'bp_follow_user_activity_admin_nav_toolbar' );
-
-/**
- * Groups follow nav items together in the BuddyBar.
- *
- * For BP Follow, we use separate nav items for the "Following" and
- * "Followers" pages, but for the BuddyBar, we want to group them together.
- *
- * Because of the way BuddyPress renders both the BuddyBar and profile nav
- * with the same code, to alter just the BuddyBar, you need to resort to
- * hacking the $bp global later on.
- *
- * This will probably break in future versions of BP, when that happens we'll
- * remove this entirely.
- *
- * If the WP Toolbar is in use, this method is skipped.
- *
- * This function was moved from {@link BP_Follow_Component} in v1.3.0 due
- * to the users module being toggleable.
- *
- * @since 1.3.0
- */
-function bp_follow_group_buddybar_items() {
-	// don't do this if we're using the WP Admin Bar / Toolbar.
-	if ( defined( 'BP_USE_WP_ADMIN_BAR' ) && BP_USE_WP_ADMIN_BAR ) {
-		return;
-	}
-
-	if ( ! bp_loggedin_user_id() ) {
-		return;
-	}
-
-	$bp = $GLOBALS['bp'];
-
-	// get follow nav positions.
-	$following_position = $bp->follow->params['adminbar_myaccount_order'];
-	$followers_position = apply_filters( 'bp_follow_followers_nav_position', 62 );
-
-	// clobberin' time!
-	unset( $bp->bp_nav[ $following_position ] );
-	unset( $bp->bp_nav[ $followers_position ] );
-	unset( $bp->bp_options_nav['following'] );
-	unset( $bp->bp_options_nav['followers'] );
-
-	$following_url = bp_follow_get_user_url( bp_loggedin_user_id(), array( $bp->follow->following->slug ) );
-
-	// Add the "Follow" nav menu.
-	$bp->bp_nav[ $following_position ] = array(
-		'name'                    => _x( 'Follow', 'Adminbar main nav', 'buddypress-followers' ),
-		'link'                    => $following_url,
-		'slug'                    => 'follow',
-		'css_id'                  => 'follow',
-		'position'                => $following_position,
-		'show_for_displayed_user' => 1,
-		'screen_function'         => 'bp_follow_screen_followers',
-	);
-
-	// "Following" subnav item
-	$bp->bp_options_nav['follow'][10] = array(
-		'name'            => _x( 'Following', 'Adminbar follow subnav', 'buddypress-followers' ),
-		'link'            => $following_url,
-		'slug'            => $bp->follow->following->slug,
-		'css_id'          => 'following',
-		'position'        => 10,
-		'user_has_access' => 1,
-		'screen_function' => 'bp_follow_screen_followers',
-	);
-
-	// "Followers" subnav item
-	$bp->bp_options_nav['follow'][20] = array(
-		'name'            => _x( 'Followers', 'Adminbar follow subnav', 'buddypress-followers' ),
-		'link'            => bp_follow_get_user_url( bp_loggedin_user_id(), array( $bp->follow->followers->slug ) ),
-		'slug'            => $bp->follow->followers->slug,
-		'css_id'          => 'followers',
-		'position'        => 20,
-		'user_has_access' => 1,
-		'screen_function' => 'bp_follow_screen_followers',
-	);
-
-	// Resort the nav items to account for the late change made above.
-	ksort( $bp->bp_nav );
-}
 
 /** LOOP INJECTION *******************************************************/
 
