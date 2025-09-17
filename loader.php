@@ -58,18 +58,18 @@ add_action( 'bp_include', 'bp_follow_init' );
  */
 function bp_follow_localization() {
     // Don't load translations before 'init' hook to prevent JIT errors
-    if (!did_action('init')) {
+    if ( ! did_action( 'init' ) ) {
         return false;
     }
-    
-    $domain = 'buddypress-followers';
-    $mofile_custom = trailingslashit(WP_LANG_DIR) . sprintf('%s-%s.mo', $domain, get_locale());
 
-    if (is_readable($mofile_custom)) {
-        return load_textdomain($domain, $mofile_custom);
+    $mofile_custom = trailingslashit( WP_LANG_DIR ) . sprintf( '%s-%s.mo', 'buddypress-followers', get_locale() );
+
+    if ( is_readable( $mofile_custom ) ) {
+        return load_textdomain( 'buddypress-followers', $mofile_custom );
     } else {
-        return load_plugin_textdomain($domain, false, basename(BP_FOLLOW_DIR) . '/languages/');
+        return load_plugin_textdomain( 'buddypress-followers', false, basename( BP_FOLLOW_DIR ) . '/languages/' );
     }
 }
+
 // Use the 'init' hook instead of 'plugins_loaded' for proper timing
-add_action('init', 'bp_follow_localization', 5);
+add_action( 'init', 'bp_follow_localization', 5 );
