@@ -575,7 +575,7 @@ function bp_follow_get_common_args( $args = array() ) {
  * @return bool
  */
 function bp_follow_is_doing_ajax() {
-	return ( isset( $_SERVER['HTTP_X_REQUESTED_WITH'] ) && strtolower( $_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest' );
+	return wp_doing_ajax();
 }
 
 /** NOTIFICATIONS *******************************************************/

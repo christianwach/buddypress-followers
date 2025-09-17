@@ -116,10 +116,11 @@ function bp_follow_set_activity_following_scope_on_ajax() {
 	// set the activity scope to 'following'
 	if ( bp_is_current_action( 'following' ) && bp_follow_is_doing_ajax() ) {
 		// if we have a post value already, let's add our scope to the existing cookie value
-		if ( !empty( $_POST['cookie'] ) )
+		if ( !empty( $_POST['cookie'] ) ) {
 			$_POST['cookie'] .= '%3B%20bp-activity-scope%3Dfollowing';
-		else
+		} else {
 			$_POST['cookie'] .= 'bp-activity-scope%3Dfollowing';
+		}
 	}
 }
 add_action( 'bp_before_activity_loop', 'bp_follow_set_activity_following_scope_on_ajax' );
