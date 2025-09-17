@@ -501,8 +501,8 @@ function bp_follow_pre_user_query( $q ) {
 		return;
 	}
 
-	// Ensure include parameter is an array to prevent count() error
-	if ( empty( $q->query_vars['include'] ) || !is_array( $q->query_vars['include'] ) ) {
+	// Ensure include parameter is an array to prevent count() error.
+	if ( empty( $q->query_vars['include'] ) || ! is_array( $q->query_vars['include'] ) ) {
 		$q->query_vars['include'] = array();
 	}
 
@@ -523,6 +523,7 @@ function bp_follow_pre_user_query( $q ) {
 		$q->query_vars['user_ids'] = array_splice( $q->query_vars['user_ids'], $q->query_vars['per_page'] * ( $q->query_vars['page'] - 1 ), $q->query_vars['per_page'] );
 	}
 }
+add_action( 'bp_pre_user_query_construct', 'bp_follow_pre_user_query' );
 
 /** AJAX MANIPULATION ****************************************************/
 
