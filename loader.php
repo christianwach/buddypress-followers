@@ -1,12 +1,12 @@
 <?php
 /*
 Plugin Name: BuddyPress Follow
-Plugin URI: http://wordpress.org/extend/plugins/buddypress-followers
 Description: Follow members on your BuddyPress site with this nifty plugin.
-Version: 1.3-alpha
-Author: Andy Peatling, r-a-y
-License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Plugin URI:  https://wordpress.org/plugins/buddypress-followers/
+Version:     1.3-alpha
+Author:      Andy Peatling, r-a-y
+License:     GPLv2 or later
+License URI: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 Text Domain: buddypress-followers
 Domain Path: /languages
 */
@@ -30,8 +30,8 @@ define( 'BP_FOLLOW_URL', plugins_url( basename( BP_FOLLOW_DIR ) ) . '/' );
  */
 function bp_follow_init() {
 	// only supported in BP 1.5+
-	if ( version_compare( BP_VERSION, '1.3', '>' ) ) {
-		require( constant( 'BP_FOLLOW_DIR' ) . '/bp-follow-core.php' );
+	if ( version_compare( BP_VERSION, '1.5', '>' ) ) {
+		require BP_FOLLOW_DIR . '/bp-follow-core.php';
 
 	// show admin notice for users on BP 1.2.x
 	} else {
@@ -57,19 +57,15 @@ add_action( 'bp_include', 'bp_follow_init' );
  * @return bool True if textdomain loaded; false if not.
  */
 function bp_follow_localization() {
-    // Don't load translations before 'init' hook to prevent JIT errors
-    if ( ! did_action( 'init' ) ) {
-        return false;
-    }
+	$domain = 'buddypress-followers';
+	$mofile_custom = trailingslashit( WP_LANG_DIR ) . sprintf( '%s-%s.mo', $domain, get_locale() );
 
-    $mofile_custom = trailingslashit( WP_LANG_DIR ) . sprintf( '%s-%s.mo', 'buddypress-followers', get_locale() );
-
-    if ( is_readable( $mofile_custom ) ) {
-        return load_textdomain( 'buddypress-followers', $mofile_custom );
-    } else {
-        return load_plugin_textdomain( 'buddypress-followers', false, basename( BP_FOLLOW_DIR ) . '/languages/' );
-    }
+	if ( is_readable( $mofile_custom ) ) {
+		return load_textdomain( $domain, $mofile_custom );
+	} else {
+		return load_plugin_textdomain( $domain, false, basename( BP_FOLLOW_DIR ) . '/languages/' );
+	}
 }
 
-// Use the 'init' hook instead of 'plugins_loaded' for proper timing
+// Use the 'init' hook instead of 'plugins_loaded' for proper timing.
 add_action( 'init', 'bp_follow_localization', 5 );
